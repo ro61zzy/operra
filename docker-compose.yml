@@ -1,14 +1,12 @@
-version: "3.9"
-
 services:
   postgres:
     image: postgres:16
     container_name: operra-postgres
     restart: always
     environment:
-      POSTGRES_USER: operra
-      POSTGRES_PASSWORD: operra_password
-      POSTGRES_DB: operra_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
