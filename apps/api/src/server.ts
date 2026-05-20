@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import { prisma } from './config/prisma'
 
 dotenv.config();
 
@@ -20,6 +21,11 @@ const PORT = process.env.PORT || 3001;
 
 app.get("/", (_, res) => {
   res.send("hello");
+});
+
+app.get("/users", async (_, res) => {
+  const users = await prisma.user.findMany();
+  res.json(users);
 });
 
 app.listen(PORT, () => {
