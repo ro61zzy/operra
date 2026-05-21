@@ -3,6 +3,9 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { prisma } from './config/prisma'
 
+//import routes
+import authRoutes from "./modules/auth/auth.routes";
+
 dotenv.config();
 
 const app = express();
@@ -23,10 +26,8 @@ app.get("/", (_, res) => {
   res.send("hello");
 });
 
-app.get("/users", async (_, res) => {
-  const users = await prisma.user.findMany();
-  res.json(users);
-});
+//api routes
+app.use("/auth", authRoutes);
 
 app.listen(PORT, () => {
   console.log(`API running on port ${PORT}`);
