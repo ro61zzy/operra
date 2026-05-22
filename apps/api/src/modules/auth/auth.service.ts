@@ -22,27 +22,34 @@ export const registerUser = async (data: RegisterInput) => {
     .toLowerCase()
     .replace(/\s+/g, "-");
 
-  const user = await prisma.user.create({
-    data: {
-      email: data.email,
-      password: hashedPassword,
-      firstName: data.firstName,
-      lastName: data.lastName,
+ const user = await prisma.user.create({
+  data: {
+    email: data.email,
+    password: hashedPassword,
+    firstName: data.firstName,
+    lastName: data.lastName,
 
-      memberships: {
-        create: {
-          role: "OWNER",
-
-          organization: {
-            create: {
-              name: data.organizationName,
-              slug,
-            },
+    memberships: {
+      create: {
+        role: "OWNER",
+        organization: {
+          create: {
+            name: data.organizationName,
+            slug,
           },
         },
       },
     },
-  });
+  },
+
+  select: {
+    id: true,
+    email: true,
+    firstName: true,
+    lastName: true,
+    createdAt: true,
+  },
+});
 
   const token = jwt.sign(
     {
