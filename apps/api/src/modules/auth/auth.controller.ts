@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
-import { registerSchema } from "./auth.validator";
-import { registerUser } from "./auth.service";
+import { registerSchema, validateLoginInput } from "./auth.validator";
+import { registerUser, loginUser } from "./auth.service";
 
 export const register = async (
   req: Request,
@@ -19,6 +19,20 @@ export const register = async (
         error instanceof Error
           ? error.message
           : "Something went wrong",
+    });
+  }
+};
+
+export const login = async (req: Request, res: Response) => {
+  try {
+    validateLoginInput(req.body);
+
+    const result = await loginUser(req.body);
+
+    res.status(200).json(result);
+  } catch (error: any) {
+    res.status(400).json({
+      message: error.message,
     });
   }
 };

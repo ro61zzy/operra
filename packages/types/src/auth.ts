@@ -5,3 +5,8 @@ export type RegisterInput = {
   lastName: string;
   organizationName: string;
 };
+
+export type LoginInput = {
+  email: string;
+  password: string;
+};
