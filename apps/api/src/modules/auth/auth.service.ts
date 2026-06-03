@@ -128,3 +128,27 @@ export const loginUser = async (data: LoginInput) => {
     token,
   };
 };
+
+//get whoami
+export const getCurrentUser = async (
+  userId: string
+) => {
+  return prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+
+      memberships: {
+        include: {
+          organization: true,
+        },
+      },
+    },
+  });
+};
