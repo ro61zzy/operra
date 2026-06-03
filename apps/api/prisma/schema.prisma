@@ -24,6 +24,7 @@ model User {
   updatedAt   DateTime     @updatedAt
 
   memberships Membership[]
+  sentInvitations Invitation[]
 }
 
 model Organization {
@@ -34,6 +35,7 @@ model Organization {
   updatedAt   DateTime     @updatedAt
 
   memberships Membership[]
+  invitations Invitation[]
 }
 
 model Membership {
@@ -50,6 +52,22 @@ model Membership {
   @@unique([userId, organizationId])
 }
 
+model Invitation {
+  id             String   @id @default(cuid())
+  email          String
+  role           Role
+
+  token          String   @unique
+  accepted       Boolean  @default(false)
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  invitedById    String
+  invitedBy      User @relation(fields: [invitedById], references: [id])
+
+  createdAt      DateTime @default(now())
+}
 
 enum Role {
   OWNER
