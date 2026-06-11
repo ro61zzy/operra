@@ -22,7 +22,7 @@ app.get("/health", (_, res) => {
   });
 });
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3009;
 
 app.get("/", (_, res) => {
   res.send("hello");
