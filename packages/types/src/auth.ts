@@ -10,3 +10,10 @@ export type LoginInput = {
   email: string;
   password: string;
 };
+
+export type RegisterFromInviteInput = {
+  token: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+};

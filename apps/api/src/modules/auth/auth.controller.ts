@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 
 import { registerSchema, validateLoginInput } from "./auth.validator";
-import { registerUser, loginUser, getCurrentUser } from "./auth.service";
+import { registerUser, loginUser, getCurrentUser, registerUserFromInvite } from "./auth.service";
+
 
 export const register = async (
   req: Request,
@@ -49,6 +50,23 @@ export const me = async (
     res.json(user);
   } catch (error: any) {
     res.status(500).json({
+      message: error.message,
+    });
+  }
+};
+
+export const registerFromInvite = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const result = await registerUserFromInvite(
+      req.body
+    );
+
+    res.status(201).json(result);
+  } catch (error: any) {
+    res.status(400).json({
       message: error.message,
     });
   }

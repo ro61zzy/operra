@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
 import { prisma } from "../../config/prisma";
-import { RegisterInput, LoginInput } from "@repo/types";
+import { RegisterInput, LoginInput, RegisterFromInviteInput } from "@repo/types";
 
 //register user service
 export const registerUser = async (data: RegisterInput) => {
@@ -151,4 +151,81 @@ export const getCurrentUser = async (
       },
     },
   });
+};
+
+export const registerUserFromInvite = async (
+  data: RegisterFromInviteInput
+) => {
+  const invitation = await prisma.invitation.findUnique({
+    where: {
+      token: data.token,
+    },
+  });
+
+  if (!invitation) {
+    throw new Error("Invitation not found");
+  }
+
+  if (invitation.accepted) {
+    throw new Error("Invitation already accepted");
+  }
+
+  const existingUser = await prisma.user.findUnique({
+    where: {
+      email: invitation.email,
+    },
+  });
+
+  if (existingUser) {
+    throw new Error(
+      "User already exists. Please login."
+    );
+  }
+
+  const hashedPassword = await bcrypt.hash(
+    data.password,
+    10
+  );
+
+  const user = await prisma.user.create({
+    data: {
+      email: invitation.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      password: hashedPassword,
+    },
+  });
+
+  await prisma.membership.create({
+    data: {
+      userId: user.id,
+      organizationId: invitation.organizationId,
+      role: invitation.role,
+    },
+  });
+
+  await prisma.invitation.update({
+    where: {
+      id: invitation.id,
+    },
+    data: {
+      accepted: true,
+    },
+  });
+
+  const token = jwt.sign(
+    {
+      userId: user.id,
+      email: user.email,
+    },
+    process.env.JWT_SECRET!,
+    {
+      expiresIn: "7d",
+    }
+  );
+
+  return {
+    user,
+    token,
+  };
 };
