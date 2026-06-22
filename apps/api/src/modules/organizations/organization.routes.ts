@@ -4,6 +4,8 @@ import {
   getMembers,
   getOrganization,
   getOrganizations,
+   currentOrganizationController,
+  switchOrganizationController,
 } from "./organization.controller";
 
 import { requireAuth } from "../../middleware/auth.middleware";
@@ -30,5 +32,18 @@ router.get(
   requireOrganizationMember,
   getMembers
 );
+
+router.get(
+  "/current",
+  requireAuth,
+  currentOrganizationController
+);
+
+router.post(
+  "/switch",
+  requireAuth,
+  switchOrganizationController
+);
+
 
 export default router;
