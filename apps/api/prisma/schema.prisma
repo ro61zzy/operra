@@ -25,6 +25,9 @@ model User {
 
   memberships Membership[]
   sentInvitations Invitation[]
+
+   currentOrganizationId String?
+  currentOrganization   Organization? @relation(fields: [currentOrganizationId], references: [id])
 }
 
 model Organization {
@@ -36,6 +39,7 @@ model Organization {
 
   memberships Membership[]
   invitations Invitation[]
+  currentUsers User[]
 }
 
 model Membership {
