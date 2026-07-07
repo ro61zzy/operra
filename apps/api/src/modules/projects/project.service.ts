@@ -4,6 +4,24 @@ import {
   UpdateProjectInput,
 } from "@repo/types";
 
+const findOrganizationProject = async (
+  id: string,
+  organizationId: string
+) => {
+  const project = await prisma.project.findFirst({
+    where: {
+      id,
+      organizationId,
+    },
+  });
+
+  if (!project) {
+    throw new Error("Project not found");
+  }
+
+  return project;
+};
+
 export const createProject = async (
   organizationId: string,
   userId: string,
@@ -50,16 +68,7 @@ export const updateProject = async (
   organizationId: string,
   data: UpdateProjectInput
 ) => {
-const project = await prisma.project.findFirst({
-  where: {
-    id,
-    organizationId,
-  },
-});
-
-if (!project) {
-  throw new Error("Project not found");
-}
+  await findOrganizationProject(id, organizationId);
 
   return prisma.project.update({
     where: {
@@ -73,22 +82,13 @@ export const deleteProject = async (
   id: string,
   organizationId: string
 ) => {
-  const project = await prisma.project.findFirst({
-  where: {
-    id,
-    organizationId,
-  },
-});
+  await findOrganizationProject(id, organizationId);
 
-if (!project) {
-  throw new Error("Project not found");
-}
-
-await prisma.project.delete({
-  where: {
-    id,
-  },
-});
+  await prisma.project.delete({
+    where: {
+      id,
+    },
+  });
 
   return {
     message: "Project deleted",
