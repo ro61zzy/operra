@@ -8,6 +8,7 @@ import authRoutes from "./modules/auth/auth.routes";
 import invitationRoutes from "./modules/invitations/invitation.routes"
 import organizationRoutes from "./modules/organizations/organization.routes";
 import projectRoutes from "./modules/projects/project.routes";
+import taskRoutes from "./modules/tasks/task.routes";
 
 dotenv.config();
 
@@ -42,6 +43,7 @@ app.use(
   invitationRoutes
 );
 app.use("/projects", projectRoutes);
+app.use("/", taskRoutes);
 
 app.listen(PORT, () => {
   console.log(`API running on port ${PORT}`);

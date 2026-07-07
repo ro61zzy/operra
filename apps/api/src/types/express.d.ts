@@ -6,6 +6,8 @@ declare global {
         email: string;
         currentOrganizationId: string | null;
       };
+
+      organizationId?: string;
     }
   }
 }

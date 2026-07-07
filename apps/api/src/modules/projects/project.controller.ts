@@ -13,16 +13,8 @@ export const createProjectController = async (
   res: Response
 ) => {
   try {
-    const organizationId = req.user?.currentOrganizationId;
-
-    if (!organizationId) {
-      return res.status(400).json({
-        message: "No organization selected",
-      });
-    }
-
     const project = await createProject(
-      organizationId,
+      req.organizationId!,
       req.user!.userId,
       req.body
     );
@@ -40,15 +32,9 @@ export const getProjectsController = async (
   res: Response
 ) => {
   try {
-    const organizationId = req.user?.currentOrganizationId;
-
-    if (!organizationId) {
-      return res.status(400).json({
-        message: "No organization selected",
-      });
-    }
-
-    const projects = await getProjects(organizationId);
+    const projects = await getProjects(
+      req.organizationId!
+    );
 
     res.json(projects);
   } catch (error: any) {
@@ -63,23 +49,17 @@ export const getProjectController = async (
   res: Response
 ) => {
   try {
-    const organizationId = req.user?.currentOrganizationId;
-
     const id = req.params.id;
 
-    if (
-      !organizationId ||
-      !id ||
-      Array.isArray(id)
-    ) {
+    if (!id || Array.isArray(id)) {
       return res.status(400).json({
-        message: "Invalid request",
+        message: "Invalid project id",
       });
     }
 
     const project = await getProject(
       id,
-      organizationId
+      req.organizationId!
     );
 
     if (!project) {
@@ -101,23 +81,17 @@ export const updateProjectController = async (
   res: Response
 ) => {
   try {
-    const organizationId = req.user?.currentOrganizationId;
-
     const id = req.params.id;
 
-    if (
-      !organizationId ||
-      !id ||
-      Array.isArray(id)
-    ) {
+    if (!id || Array.isArray(id)) {
       return res.status(400).json({
-        message: "Invalid request",
+        message: "Invalid project id",
       });
     }
 
     const project = await updateProject(
       id,
-      organizationId,
+      req.organizationId!,
       req.body
     );
 
@@ -134,23 +108,17 @@ export const deleteProjectController = async (
   res: Response
 ) => {
   try {
-    const organizationId = req.user?.currentOrganizationId;
-
     const id = req.params.id;
 
-    if (
-      !organizationId ||
-      !id ||
-      Array.isArray(id)
-    ) {
+    if (!id || Array.isArray(id)) {
       return res.status(400).json({
-        message: "Invalid request",
+        message: "Invalid project id",
       });
     }
 
     const result = await deleteProject(
       id,
-      organizationId
+      req.organizationId!
     );
 
     res.json(result);
