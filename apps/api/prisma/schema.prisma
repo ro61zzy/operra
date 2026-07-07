@@ -26,8 +26,11 @@ model User {
   memberships Membership[]
   sentInvitations Invitation[]
 
-   currentOrganizationId String?
+ createdProjects Project[] @relation("ProjectCreator")
+  currentOrganizationId String?
   currentOrganization   Organization? @relation(fields: [currentOrganizationId], references: [id])
+   assignedTasks Task[] @relation("TaskAssignee")
+  createdTasks Task[] @relation("TaskCreator")
 }
 
 model Organization {
@@ -40,6 +43,7 @@ model Organization {
   memberships Membership[]
   invitations Invitation[]
   currentUsers User[]
+  projects Project[]
 }
 
 model Membership {
@@ -73,8 +77,56 @@ model Invitation {
   createdAt      DateTime @default(now())
 }
 
+model Project {
+  id             String   @id @default(cuid())
+  name           String
+  description    String?
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  createdById    String
+  createdBy User @relation("ProjectCreator", fields: [createdById], references: [id])
+  
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tasks          Task[]
+}
+
+
+
+model Task {
+  id          String   @id @default(cuid())
+
+  title       String
+  description String?
+
+  status      TaskStatus @default(TODO)
+
+  projectId   String
+  project     Project @relation(fields: [projectId], references: [id])
+
+  assigneeId  String?
+  assignee    User? @relation("TaskAssignee", fields: [assigneeId], references: [id])
+
+  createdById String
+  createdBy   User @relation("TaskCreator", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 enum Role {
   OWNER
   ADMIN
   MEMBER
 }
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+}
+
