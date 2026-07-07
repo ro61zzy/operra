@@ -130,3 +130,34 @@ export const deleteTask = async (
     message: "Task deleted",
   };
 };
+
+export const updateTaskStatus = async (
+  id: string,
+  organizationId: string,
+  status: "TODO" | "IN_PROGRESS" | "DONE"
+) => {
+  const task = await prisma.task.findFirst({
+    where: {
+      id,
+      project: {
+        organizationId,
+      },
+    },
+  });
+
+  if (!task) {
+    throw new AppError(
+      "Task not found",
+      404
+    );
+  }
+
+  return prisma.task.update({
+    where: {
+      id,
+    },
+    data: {
+      status,
+    },
+  });
+};
