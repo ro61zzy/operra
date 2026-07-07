@@ -11,13 +11,21 @@ import {
   deleteProjectController,
 } from "./project.controller";
 
+import { validate } from "../../middleware/validation.middleware";
+
+import {
+    createProjectSchema,
+    updateProjectSchema,
+} from "./project.validation";
+
 const router = Router();
 
 router.post(
-  "/",
-  requireAuth,
-  requireCurrentOrganization,
-  createProjectController
+    "/",
+    requireAuth,
+    requireCurrentOrganization,
+    validate(createProjectSchema),
+    createProjectController
 );
 
 router.get(
@@ -35,10 +43,11 @@ router.get(
 );
 
 router.patch(
-  "/:id",
-  requireAuth,
-  requireCurrentOrganization,
-  updateProjectController
+    "/:id",
+    requireAuth,
+    requireCurrentOrganization,
+    validate(updateProjectSchema),
+    updateProjectController
 );
 
 router.delete(

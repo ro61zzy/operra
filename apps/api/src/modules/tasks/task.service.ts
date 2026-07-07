@@ -3,6 +3,7 @@ import {
   CreateTaskInput,
   UpdateTaskInput,
 } from "@repo/types";
+import { AppError } from "../../utils/AppError";
 
 const findProject = async (
   projectId: string,
@@ -16,8 +17,11 @@ const findProject = async (
   });
 
   if (!project) {
-    throw new Error("Project not found");
-  }
+  throw new AppError(
+    "Project not found",
+    404
+  );
+}
 
   return project;
 };
@@ -65,4 +69,64 @@ export const getTasks = async (
       createdAt: "desc",
     },
   });
+};
+
+export const updateTask = async (
+  id: string,
+  organizationId: string,
+  data: UpdateTaskInput
+) => {
+  const task = await prisma.task.findFirst({
+    where: {
+      id,
+      project: {
+        organizationId,
+      },
+    },
+  });
+
+  if (!task) {
+    throw new AppError(
+      "Task not found",
+      404
+    );
+  }
+
+  return prisma.task.update({
+    where: {
+      id,
+    },
+    data,
+  });
+};
+
+export const deleteTask = async (
+  id: string,
+  organizationId: string
+) => {
+  const task = await prisma.task.findFirst({
+    where: {
+      id,
+      project: {
+        organizationId,
+      },
+    },
+  });
+
+  if (!task) {
+    throw new AppError(
+      "Task not found",
+      404
+    );
+  }
+
+  await prisma.task.delete({
+    where: {
+      id,
+    },
+  });
+
+  return {
+    message: "Task deleted",
+  };
 };

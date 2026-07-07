@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { AppError } from "../../utils/AppError";
 
 import {
   createProject,
@@ -62,11 +63,12 @@ export const getProjectController = async (
       req.organizationId!
     );
 
-    if (!project) {
-      return res.status(404).json({
-        message: "Project not found",
-      });
-    }
+   if (!project) {
+  throw new AppError(
+    "Project not found",
+    404
+  );
+}
 
     res.json(project);
   } catch (error: any) {
