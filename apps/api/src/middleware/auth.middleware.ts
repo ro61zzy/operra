@@ -1,7 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
-export const requireAuth = (
+import { prisma } from "../config/prisma";
+
+export const requireAuth = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -17,33 +19,51 @@ export const requireAuth = (
 
     const token = authHeader.split(" ")[1];
 
-if (!token) {
-  return res.status(401).json({
-    message: "Unauthorized",
-  });
-}
+    if (!token) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
 
-   const decoded = jwt.verify(
-  token,
-  process.env.JWT_SECRET!
-);
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET!
+    );
 
-if (
-  typeof decoded === "string" ||
-  !decoded ||
-  !("userId" in decoded)
-) {
-  return res.status(401).json({
-    message: "Invalid token",
-  });
-}
+    if (
+      typeof decoded === "string" ||
+      !("userId" in decoded)
+    ) {
+      return res.status(401).json({
+        message: "Invalid token",
+      });
+    }
 
-req.user = {
-  userId: decoded.userId,
-  email: decoded.email,
-};
+    const user = await prisma.user.findUnique({
+      where: {
+        id: decoded.userId,
+      },
+      select: {
+        id: true,
+        email: true,
+        currentOrganizationId: true,
+      },
+    });
 
-next();
+    if (!user) {
+      return res.status(401).json({
+        message: "User not found",
+      });
+    }
+
+    req.user = {
+      userId: user.id,
+      email: user.email,
+      currentOrganizationId:
+        user.currentOrganizationId,
+    };
+
+    next();
   } catch {
     return res.status(401).json({
       message: "Invalid token",

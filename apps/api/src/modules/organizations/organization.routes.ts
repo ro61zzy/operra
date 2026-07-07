@@ -20,6 +20,18 @@ router.get(
 );
 
 router.get(
+  "/current",
+  requireAuth,
+  currentOrganizationController
+);
+
+router.post(
+  "/switch",
+  requireAuth,
+  switchOrganizationController
+);
+
+router.get(
   "/:id",
   requireAuth,
   requireOrganizationMember,
@@ -31,18 +43,6 @@ router.get(
   requireAuth,
   requireOrganizationMember,
   getMembers
-);
-
-router.get(
-  "/current",
-  requireAuth,
-  currentOrganizationController
-);
-
-router.post(
-  "/switch",
-  requireAuth,
-  switchOrganizationController
 );
 
 

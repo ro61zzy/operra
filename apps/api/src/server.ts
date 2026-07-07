@@ -7,6 +7,7 @@ import { prisma } from './config/prisma'
 import authRoutes from "./modules/auth/auth.routes";
 import invitationRoutes from "./modules/invitations/invitation.routes"
 import organizationRoutes from "./modules/organizations/organization.routes";
+import projectRoutes from "./modules/projects/project.routes";
 
 dotenv.config();
 
@@ -22,7 +23,7 @@ app.get("/health", (_, res) => {
   });
 });
 
-const PORT = process.env.PORT || 3009;
+const PORT = process.env.PORT || 3001;
 
 app.get("/", (_, res) => {
   res.send("hello");
@@ -40,6 +41,7 @@ app.use(
   "/invitations",
   invitationRoutes
 );
+app.use("/projects", projectRoutes);
 
 app.listen(PORT, () => {
   console.log(`API running on port ${PORT}`);
