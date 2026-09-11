@@ -122,6 +122,9 @@ model Task {
 
   comments  Comment[]
   activities Activity[]
+
+  priority  TaskPriority @default(MEDIUM)
+dueDate   DateTime?
 }
 
 model Comment {
@@ -176,3 +179,9 @@ enum TaskStatus {
   DONE
 }
 
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}

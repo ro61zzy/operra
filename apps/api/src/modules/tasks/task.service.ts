@@ -36,14 +36,18 @@ export const createTask = async (
   await findProject(projectId, organizationId);
 
   const task = await prisma.task.create({
-    data: {
-      title: data.title,
-      description: data.description,
-      assigneeId: data.assigneeId,
-      projectId,
-      createdById: userId,
-    },
-  });
+  data: {
+    title: data.title,
+    description: data.description,
+    assigneeId: data.assigneeId,
+    priority: data.priority,
+    dueDate: data.dueDate
+      ? new Date(data.dueDate)
+      : undefined,
+    projectId,
+    createdById: userId,
+  },
+});
 
   await createActivity({
     taskId: task.id,
@@ -100,7 +104,15 @@ export const updateTask = async (
 
   const updatedTask = await prisma.task.update({
     where: { id },
-    data,
+      data: {
+    ...data,
+    dueDate:
+      data.dueDate === undefined
+        ? undefined
+        : data.dueDate === null
+          ? null
+          : new Date(data.dueDate),
+  },
   });
 
   if (
