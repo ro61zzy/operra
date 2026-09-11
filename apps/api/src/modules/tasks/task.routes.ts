@@ -2,6 +2,7 @@ import { Router } from "express";
 import { validate } from "../../middleware/validation.middleware";
 import { requireAuth } from "../../middleware/auth.middleware";
 import { requireCurrentOrganization } from "../../middleware/current-organization.middleware";
+import { getTaskTimelineController } from "./task-timeline.controller";
 
 import {
   createTaskController,
@@ -34,6 +35,13 @@ router.get(
   requireAuth,
   requireCurrentOrganization,
   getTasksController
+);
+
+router.get(
+  "/tasks/:taskId/timeline",
+  requireAuth,
+  requireCurrentOrganization,
+  getTaskTimelineController
 );
 
 router.patch(

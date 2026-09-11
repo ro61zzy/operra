@@ -3,6 +3,7 @@ import {
   CreateTaskInput,
   UpdateTaskInput,
 } from "@repo/types";
+import { createActivity } from "../activities/activity.service";
 import { AppError } from "../../utils/AppError";
 
 const findProject = async (
@@ -34,16 +35,23 @@ export const createTask = async (
 ) => {
   await findProject(projectId, organizationId);
 
-  return prisma.task.create({
+  const task = await prisma.task.create({
     data: {
       title: data.title,
       description: data.description,
-
       assigneeId: data.assigneeId,
       projectId,
       createdById: userId,
     },
   });
+
+  await createActivity({
+    taskId: task.id,
+    actorId: userId,
+    action: "CREATED",
+  });
+
+  return task;
 };
 
 export const getTasks = async (
@@ -74,6 +82,7 @@ export const getTasks = async (
 export const updateTask = async (
   id: string,
   organizationId: string,
+  userId: string,
   data: UpdateTaskInput
 ) => {
   const task = await prisma.task.findFirst({
@@ -86,18 +95,30 @@ export const updateTask = async (
   });
 
   if (!task) {
-    throw new AppError(
-      "Task not found",
-      404
-    );
+    throw new AppError("Task not found", 404);
   }
 
-  return prisma.task.update({
-    where: {
-      id,
-    },
+  const updatedTask = await prisma.task.update({
+    where: { id },
     data,
   });
+
+  if (
+    data.assigneeId !== undefined &&
+    data.assigneeId !== task.assigneeId
+  ) {
+    await createActivity({
+      taskId: id,
+      actorId: userId,
+      action: data.assigneeId
+        ? "ASSIGNED"
+        : "UNASSIGNED",
+      oldValue: task.assigneeId ?? undefined,
+      newValue: data.assigneeId ?? undefined,
+    });
+  }
+
+  return updatedTask;
 };
 
 export const deleteTask = async (
@@ -134,6 +155,7 @@ export const deleteTask = async (
 export const updateTaskStatus = async (
   id: string,
   organizationId: string,
+  userId: string,
   status: "TODO" | "IN_PROGRESS" | "DONE"
 ) => {
   const task = await prisma.task.findFirst({
@@ -146,18 +168,21 @@ export const updateTaskStatus = async (
   });
 
   if (!task) {
-    throw new AppError(
-      "Task not found",
-      404
-    );
+    throw new AppError("Task not found", 404);
   }
 
-  return prisma.task.update({
-    where: {
-      id,
-    },
-    data: {
-      status,
-    },
+  const updatedTask = await prisma.task.update({
+    where: { id },
+    data: { status },
   });
+
+  await createActivity({
+    taskId: id,
+    actorId: userId,
+    action: "STATUS_CHANGED",
+    oldValue: task.status,
+    newValue: status,
+  });
+
+  return updatedTask;
 };

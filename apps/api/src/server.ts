@@ -10,6 +10,8 @@ import organizationRoutes from "./modules/organizations/organization.routes";
 import projectRoutes from "./modules/projects/project.routes";
 import taskRoutes from "./modules/tasks/task.routes";
 import commentRoutes from "./modules/comments/comment.routes";
+import activityRoutes from "./modules/activities/activity.routes";
+
 import { errorHandler } from "./middleware/error.middleware";
 
 dotenv.config();
@@ -47,6 +49,7 @@ app.use(
 app.use("/projects", projectRoutes);
 app.use("/", taskRoutes);
 app.use("/", commentRoutes);
+app.use("/", activityRoutes);
 
 app.use(errorHandler);
 

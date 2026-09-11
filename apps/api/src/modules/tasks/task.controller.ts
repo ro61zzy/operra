@@ -75,11 +75,12 @@ export const updateTaskController = async (
       });
     }
 
-    const task = await updateTask(
-      id,
-      req.organizationId!,
-      req.body
-    );
+   const task = await updateTask(
+  id,
+  req.organizationId!,
+  req.user!.userId,
+  req.body
+);
 
     res.json(task);
   } catch (error: any) {
@@ -129,10 +130,11 @@ export const updateTaskStatusController = async (
     }
 
     const task = await updateTaskStatus(
-      id,
-      req.organizationId!,
-      req.body.status
-    );
+  id,
+  req.organizationId!,
+  req.user!.userId,
+  req.body.status
+);
 
     res.json(task);
   } catch (error: any) {
