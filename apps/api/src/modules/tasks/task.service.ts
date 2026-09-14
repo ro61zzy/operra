@@ -67,37 +67,63 @@ export const getTasks = async (
     assigneeId?: string;
     sortBy?: "createdAt" | "dueDate" | "priority";
     sortOrder?: "asc" | "desc";
+    page?: number;
+    limit?: number;
   }
 ) => {
   await findProject(projectId, organizationId);
 
-  return prisma.task.findMany({
-    where: {
-      projectId,
-      ...(filters.status && {
-        status: filters.status,
-      }),
-      ...(filters.priority && {
-        priority: filters.priority,
-      }),
-      ...(filters.assigneeId && {
-        assigneeId: filters.assigneeId,
-      }),
-    },
-    include: {
-      assignee: {
-        select: {
-          id: true,
-          firstName: true,
-          lastName: true,
+  const page = filters.page ?? 1;
+  const limit = filters.limit ?? 10;
+  const skip = (page - 1) * limit;
+
+  const where = {
+    projectId,
+    ...(filters.status && {
+      status: filters.status,
+    }),
+    ...(filters.priority && {
+      priority: filters.priority,
+    }),
+    ...(filters.assigneeId && {
+      assigneeId: filters.assigneeId,
+    }),
+  };
+
+  const [tasks, total] = await Promise.all([
+    prisma.task.findMany({
+      where,
+      include: {
+        assignee: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+          },
         },
       },
+      orderBy: {
+        [filters.sortBy ?? "createdAt"]:
+          filters.sortOrder ?? "desc",
+      },
+      skip,
+      take: limit,
+    }),
+
+    prisma.task.count({
+      where,
+    }),
+  ]);
+
+  return {
+    tasks,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
     },
-    orderBy: {
-      [filters.sortBy ?? "createdAt"]:
-        filters.sortOrder ?? "desc",
-    },
-  });
+  };
 };
 
 export const updateTask = async (
