@@ -50,9 +50,38 @@ export const getTasksController = async (
     }
 
     const tasks = await getTasks(
-      projectId,
-      req.organizationId!
-    );
+  projectId,
+  req.organizationId!,
+  {
+    status: req.query.status as
+      | "TODO"
+      | "IN_PROGRESS"
+      | "DONE"
+      | undefined,
+
+    priority: req.query.priority as
+      | "LOW"
+      | "MEDIUM"
+      | "HIGH"
+      | "URGENT"
+      | undefined,
+
+    assigneeId: req.query.assigneeId as
+      | string
+      | undefined,
+
+    sortBy: req.query.sortBy as
+      | "createdAt"
+      | "dueDate"
+      | "priority"
+      | undefined,
+
+    sortOrder: req.query.sortOrder as
+      | "asc"
+      | "desc"
+      | undefined,
+  }
+);
 
     res.json(tasks);
   } catch (error: any) {
