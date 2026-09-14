@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-
+import { asyncHandler } from "../../utils/asyncHandler";
 import {
   createTask,
   getTasks,
@@ -36,11 +36,8 @@ export const createTaskController = async (
   }
 };
 
-export const getTasksController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
+export const getTasksController = asyncHandler(
+  async (req, res) => {
     const projectId = req.params.projectId;
 
     if (!projectId || Array.isArray(projectId)) {
@@ -82,18 +79,13 @@ export const getTasksController = async (
           | undefined,
 
         page: Number(req.query.page) || 1,
-
         limit: Number(req.query.limit) || 10,
       }
     );
 
     res.json(tasks);
-  } catch (error: any) {
-    res.status(500).json({
-      message: error.message,
-    });
   }
-};
+);
 
 export const updateTaskController = async (
   req: Request,
