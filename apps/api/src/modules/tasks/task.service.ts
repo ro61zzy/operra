@@ -60,13 +60,29 @@ export const createTask = async (
 
 export const getTasks = async (
   projectId: string,
-  organizationId: string
+  organizationId: string,
+  filters: {
+    status?: "TODO" | "IN_PROGRESS" | "DONE";
+    priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+    assigneeId?: string;
+    sortBy?: "createdAt" | "dueDate" | "priority";
+    sortOrder?: "asc" | "desc";
+  }
 ) => {
   await findProject(projectId, organizationId);
 
   return prisma.task.findMany({
     where: {
       projectId,
+      ...(filters.status && {
+        status: filters.status,
+      }),
+      ...(filters.priority && {
+        priority: filters.priority,
+      }),
+      ...(filters.assigneeId && {
+        assigneeId: filters.assigneeId,
+      }),
     },
     include: {
       assignee: {
@@ -78,7 +94,8 @@ export const getTasks = async (
       },
     },
     orderBy: {
-      createdAt: "desc",
+      [filters.sortBy ?? "createdAt"]:
+        filters.sortOrder ?? "desc",
     },
   });
 };
