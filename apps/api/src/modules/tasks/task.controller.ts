@@ -8,11 +8,8 @@ import {
   updateTaskStatus,
 } from "./task.service";
 
-export const createTaskController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
+export const createTaskController = asyncHandler(
+  async (req, res) => {
     const projectId = req.params.projectId;
 
     if (!projectId || Array.isArray(projectId)) {
@@ -29,12 +26,8 @@ export const createTaskController = async (
     );
 
     res.status(201).json(task);
-  } catch (error: any) {
-    res.status(400).json({
-      message: error.message,
-    });
   }
-};
+);
 
 export const getTasksController = asyncHandler(
   async (req, res) => {
@@ -87,11 +80,8 @@ export const getTasksController = asyncHandler(
   }
 );
 
-export const updateTaskController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
+export const updateTaskController = asyncHandler(
+  async (req, res) => {
     const id = req.params.id;
 
     if (!id || Array.isArray(id)) {
@@ -100,26 +90,19 @@ export const updateTaskController = async (
       });
     }
 
-   const task = await updateTask(
-  id,
-  req.organizationId!,
-  req.user!.userId,
-  req.body
-);
+    const task = await updateTask(
+      id,
+      req.organizationId!,
+      req.user!.userId,
+      req.body
+    );
 
     res.json(task);
-  } catch (error: any) {
-    res.status(400).json({
-      message: error.message,
-    });
   }
-};
+);
 
-export const deleteTaskController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
+export const deleteTaskController = asyncHandler(
+  async (req, res) => {
     const id = req.params.id;
 
     if (!id || Array.isArray(id)) {
@@ -134,18 +117,11 @@ export const deleteTaskController = async (
     );
 
     res.json(result);
-  } catch (error: any) {
-    res.status(400).json({
-      message: error.message,
-    });
   }
-};
+);
 
-export const updateTaskStatusController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
+export const updateTaskStatusController = asyncHandler(
+  async (req, res) => {
     const id = req.params.id;
 
     if (!id || Array.isArray(id)) {
@@ -155,16 +131,12 @@ export const updateTaskStatusController = async (
     }
 
     const task = await updateTaskStatus(
-  id,
-  req.organizationId!,
-  req.user!.userId,
-  req.body.status
-);
+      id,
+      req.organizationId!,
+      req.user!.userId,
+      req.body.status
+    );
 
     res.json(task);
-  } catch (error: any) {
-    res.status(400).json({
-      message: error.message,
-    });
   }
-};
+);
