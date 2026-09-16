@@ -147,16 +147,75 @@ export const updateTask = async (
 
   const updatedTask = await prisma.task.update({
     where: { id },
-      data: {
-    ...data,
-    dueDate:
-      data.dueDate === undefined
-        ? undefined
-        : data.dueDate === null
-          ? null
-          : new Date(data.dueDate),
-  },
+    data: {
+      ...data,
+      dueDate:
+        data.dueDate === undefined
+          ? undefined
+          : data.dueDate === null
+            ? null
+            : new Date(data.dueDate),
+    },
   });
+
+  if (
+    data.title !== undefined &&
+    data.title !== task.title
+  ) {
+    await createActivity({
+      taskId: id,
+      actorId: userId,
+      action: "UPDATED",
+      oldValue: task.title,
+      newValue: data.title,
+    });
+  }
+
+  if (
+    data.description !== undefined &&
+    data.description !== task.description
+  ) {
+    await createActivity({
+      taskId: id,
+      actorId: userId,
+      action: "UPDATED",
+      oldValue: task.description ?? "",
+      newValue: data.description,
+    });
+  }
+
+  if (
+    data.priority !== undefined &&
+    data.priority !== task.priority
+  ) {
+    await createActivity({
+      taskId: id,
+      actorId: userId,
+      action: "UPDATED",
+      oldValue: task.priority,
+      newValue: data.priority,
+    });
+  }
+
+  if (
+    data.dueDate !== undefined &&
+    String(task.dueDate) !==
+      String(
+        data.dueDate
+          ? new Date(data.dueDate)
+          : null
+      )
+  ) {
+    await createActivity({
+      taskId: id,
+      actorId: userId,
+      action: "UPDATED",
+      oldValue: task.dueDate
+        ? task.dueDate.toISOString()
+        : "",
+      newValue: data.dueDate ?? "",
+    });
+  }
 
   if (
     data.assigneeId !== undefined &&
@@ -168,8 +227,8 @@ export const updateTask = async (
       action: data.assigneeId
         ? "ASSIGNED"
         : "UNASSIGNED",
-      oldValue: task.assigneeId ?? undefined,
-      newValue: data.assigneeId ?? undefined,
+      oldValue: task.assigneeId ?? "",
+      newValue: data.assigneeId ?? "",
     });
   }
 
