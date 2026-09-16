@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
 
+import { asyncHandler } from "../../utils/asyncHandler";
+
 import { getTaskActivities } from "./activity.service";
 
-export const getTaskActivitiesController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
+export const getTaskActivitiesController = asyncHandler(
+  async (req, res) => {
     const taskId = req.params.taskId;
 
     if (!taskId || Array.isArray(taskId)) {
@@ -21,9 +20,5 @@ export const getTaskActivitiesController = async (
     );
 
     res.json(activities);
-  } catch (error: any) {
-    res.status(400).json({
-      message: error.message,
-    });
   }
-};
+);

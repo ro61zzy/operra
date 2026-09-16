@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
 
+import { asyncHandler } from "../../utils/asyncHandler";
+
 import { getTaskTimeline } from "./task-timeline.service";
 
-export const getTaskTimelineController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
+export const getTaskTimelineController = asyncHandler(
+  async (req, res) => {
     const taskId = req.params.taskId;
 
     if (!taskId || Array.isArray(taskId)) {
@@ -21,9 +20,5 @@ export const getTaskTimelineController = async (
     );
 
     res.json(timeline);
-  } catch (error: any) {
-    res.status(400).json({
-      message: error.message,
-    });
   }
-};
+);

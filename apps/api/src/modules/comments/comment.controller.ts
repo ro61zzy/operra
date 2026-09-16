@@ -1,17 +1,16 @@
 import { Request, Response } from "express";
 
+import { asyncHandler } from "../../utils/asyncHandler";
+
 import {
   createComment,
   getComments,
   updateComment,
-  deleteComment
+  deleteComment,
 } from "./comment.service";
 
-export const createCommentController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
+export const createCommentController = asyncHandler(
+  async (req, res) => {
     const taskId = req.params.taskId;
 
     if (!taskId || Array.isArray(taskId)) {
@@ -28,18 +27,11 @@ export const createCommentController = async (
     );
 
     res.status(201).json(comment);
-  } catch (error: any) {
-    res.status(400).json({
-      message: error.message,
-    });
   }
-};
+);
 
-export const getCommentsController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
+export const getCommentsController = asyncHandler(
+  async (req, res) => {
     const taskId = req.params.taskId;
 
     if (!taskId || Array.isArray(taskId)) {
@@ -54,18 +46,11 @@ export const getCommentsController = async (
     );
 
     res.json(comments);
-  } catch (error: any) {
-    res.status(400).json({
-      message: error.message,
-    });
   }
-};
+);
 
-export const updateCommentController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
+export const updateCommentController = asyncHandler(
+  async (req, res) => {
     const id = req.params.id;
 
     if (!id || Array.isArray(id)) {
@@ -82,18 +67,11 @@ export const updateCommentController = async (
     );
 
     res.json(comment);
-  } catch (error: any) {
-    res.status(400).json({
-      message: error.message,
-    });
   }
-};
+);
 
-export const deleteCommentController = async (
-  req: Request,
-  res: Response
-) => {
-  try {
+export const deleteCommentController = asyncHandler(
+  async (req, res) => {
     const id = req.params.id;
 
     if (!id || Array.isArray(id)) {
@@ -109,9 +87,5 @@ export const deleteCommentController = async (
     );
 
     res.json(result);
-  } catch (error: any) {
-    res.status(400).json({
-      message: error.message,
-    });
   }
-};
+);
