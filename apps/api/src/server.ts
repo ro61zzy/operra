@@ -11,6 +11,7 @@ import projectRoutes from "./modules/projects/project.routes";
 import taskRoutes from "./modules/tasks/task.routes";
 import commentRoutes from "./modules/comments/comment.routes";
 import activityRoutes from "./modules/activities/activity.routes";
+import notificationRoutes from "./modules/notifications/notification.routes";
 
 import { errorHandler } from "./middleware/error.middleware";
 
@@ -50,6 +51,7 @@ app.use("/projects", projectRoutes);
 app.use("/", taskRoutes);
 app.use("/", commentRoutes);
 app.use("/", activityRoutes);
+app.use("/notifications", notificationRoutes);
 
 app.use(errorHandler);
 
