@@ -3,6 +3,7 @@ import {
   CreateCommentInput,
   UpdateCommentInput,
 } from "@repo/types";
+import { createActivity } from "../activities/activity.service";
 
 export const createComment = async (
   taskId: string,
@@ -23,7 +24,7 @@ export const createComment = async (
     throw new Error("Task not found");
   }
 
-  return prisma.comment.create({
+  const comment = await prisma.comment.create({
     data: {
       content: data.content,
       taskId,
@@ -39,6 +40,14 @@ export const createComment = async (
       },
     },
   });
+
+  await createActivity({
+    taskId,
+    actorId: authorId,
+    action: "COMMENTED",
+  });
+
+  return comment;
 };
 
 export const getComments = async (
