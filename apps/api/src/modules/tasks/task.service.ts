@@ -5,6 +5,8 @@ import {
 } from "@repo/types";
 import { createActivity } from "../activities/activity.service";
 import { AppError } from "../../utils/AppError";
+import { createNotification } from "../notifications/notification.service";
+
 
 const findProject = async (
   projectId: string,
@@ -231,6 +233,18 @@ export const updateTask = async (
       newValue: data.assigneeId ?? "",
     });
   }
+
+if (
+  data.assigneeId &&
+  data.assigneeId !== task.assigneeId
+) {
+  await createNotification({
+    userId: data.assigneeId,
+    type: "TASK_ASSIGNED",
+    message: `You were assigned the task "${task.title}"`,
+    taskId: task.id,
+  });
+}
 
   return updatedTask;
 };

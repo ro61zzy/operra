@@ -33,6 +33,7 @@ model User {
   createdTasks Task[] @relation("TaskCreator")
   comments          Comment[]   @relation("CommentAuthor")
 activities        Activity[]  @relation("ActivityActor")
+notifications Notification[]
 }
 
 model Organization {
@@ -125,6 +126,7 @@ model Task {
 
   priority  TaskPriority @default(MEDIUM)
 dueDate   DateTime?
+notifications Notification[]
 }
 
 model Comment {
@@ -155,6 +157,28 @@ model Activity {
   actor     User     @relation("ActivityActor", fields: [actorId], references: [id])
 
   createdAt DateTime @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+
+  type      NotificationType
+  message   String
+  read      Boolean  @default(false)
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+enum NotificationType {
+  TASK_ASSIGNED
+  COMMENT_MENTION
+  TASK_DUE
 }
 
 enum ActivityAction {
