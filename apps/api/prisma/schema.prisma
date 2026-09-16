@@ -160,19 +160,19 @@ model Activity {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
+  id          String   @id @default(cuid())
+  type        NotificationType
+  message     String
+  read        Boolean  @default(false)
+  notifiedAt  DateTime?
 
-  type      NotificationType
-  message   String
-  read      Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  taskId      String?
+  task       Task?     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
-  taskId    String?
-  task      Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
+  createdAt   DateTime @default(now())
 }
 
 enum NotificationType {
