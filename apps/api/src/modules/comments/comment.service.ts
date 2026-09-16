@@ -4,6 +4,7 @@ import {
   UpdateCommentInput,
 } from "@repo/types";
 import { createActivity } from "../activities/activity.service";
+import { createNotification } from "../notifications/notification.service";
 
 export const createComment = async (
   taskId: string,
@@ -40,6 +41,19 @@ export const createComment = async (
       },
     },
   });
+
+  if (data.mentionedUserIds?.length) {
+  await Promise.all(
+    data.mentionedUserIds.map((userId) =>
+      createNotification({
+        userId,
+        type: "COMMENT_MENTION",
+        message: `${comment.author.firstName ?? "Someone"} mentioned you in a comment`,
+        taskId,
+      })
+    )
+  );
+}
 
   await createActivity({
     taskId,
