@@ -178,7 +178,8 @@ export const updateTask = async (
 
 export const deleteTask = async (
   id: string,
-  organizationId: string
+  organizationId: string,
+  userId: string
 ) => {
   const task = await prisma.task.findFirst({
     where: {
@@ -190,16 +191,17 @@ export const deleteTask = async (
   });
 
   if (!task) {
-    throw new AppError(
-      "Task not found",
-      404
-    );
+    throw new AppError("Task not found", 404);
   }
 
+  await createActivity({
+    taskId: task.id,
+    actorId: userId,
+    action: "DELETED",
+  });
+
   await prisma.task.delete({
-    where: {
-      id,
-    },
+    where: { id },
   });
 
   return {

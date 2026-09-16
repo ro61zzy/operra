@@ -148,8 +148,8 @@ model Activity {
   oldValue  String?
   newValue  String?
 
-  taskId    String
-  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId    String?
+  task      Task?     @relation(fields: [taskId], references: [id], onDelete: SetNull)
 
   actorId   String
   actor     User     @relation("ActivityActor", fields: [actorId], references: [id])

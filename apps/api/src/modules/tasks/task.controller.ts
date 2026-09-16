@@ -111,10 +111,11 @@ export const deleteTaskController = asyncHandler(
       });
     }
 
-    const result = await deleteTask(
-      id,
-      req.organizationId!
-    );
+   const result = await deleteTask(
+  id,
+  req.organizationId!,
+  req.user!.userId
+);
 
     res.json(result);
   }
