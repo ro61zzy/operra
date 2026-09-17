@@ -12,6 +12,8 @@ import taskRoutes from "./modules/tasks/task.routes";
 import commentRoutes from "./modules/comments/comment.routes";
 import activityRoutes from "./modules/activities/activity.routes";
 import notificationRoutes from "./modules/notifications/notification.routes";
+import "./jobs/workers/notification.worker";
+
 
 import { errorHandler } from "./middleware/error.middleware";
 

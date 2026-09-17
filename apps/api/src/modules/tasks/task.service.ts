@@ -6,6 +6,7 @@ import {
 import { createActivity } from "../activities/activity.service";
 import { AppError } from "../../utils/AppError";
 import { createNotification } from "../notifications/notification.service";
+import { addTaskDueNotificationJob } from "../../jobs/queues/notification.jobs";
 
 
 const findProject = async (
@@ -38,24 +39,31 @@ export const createTask = async (
   await findProject(projectId, organizationId);
 
   const task = await prisma.task.create({
-  data: {
-    title: data.title,
-    description: data.description,
-    assigneeId: data.assigneeId,
-    priority: data.priority,
-    dueDate: data.dueDate
-      ? new Date(data.dueDate)
-      : undefined,
-    projectId,
-    createdById: userId,
-  },
-});
+    data: {
+      title: data.title,
+      description: data.description,
+      assigneeId: data.assigneeId,
+      priority: data.priority,
+      dueDate: data.dueDate
+        ? new Date(data.dueDate)
+        : undefined,
+      projectId,
+      createdById: userId,
+    },
+  });
 
   await createActivity({
     taskId: task.id,
     actorId: userId,
     action: "CREATED",
   });
+
+  if (task.dueDate && task.assigneeId) {
+    await addTaskDueNotificationJob(
+      task.id,
+      task.assigneeId
+    );
+  }
 
   return task;
 };
@@ -160,6 +168,7 @@ export const updateTask = async (
     },
   });
 
+
   if (
     data.title !== undefined &&
     data.title !== task.title
@@ -234,6 +243,17 @@ export const updateTask = async (
     });
   }
 
+if (
+  data.dueDate !== undefined &&
+  updatedTask.dueDate &&
+  updatedTask.assigneeId
+) {
+  await addTaskDueNotificationJob(
+    updatedTask.id,
+    updatedTask.assigneeId
+  );
+}
+  
 if (
   data.assigneeId &&
   data.assigneeId !== task.assigneeId
