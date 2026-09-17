@@ -30,6 +30,27 @@ const findProject = async (
   return project;
 };
 
+const findOrganizationMember = async (
+  userId: string,
+  organizationId: string
+) => {
+  const membership = await prisma.membership.findFirst({
+    where: {
+      userId,
+      organizationId,
+    },
+  });
+
+  if (!membership) {
+    throw new AppError(
+      "Assignee must be a member of the organization",
+      400
+    );
+  }
+
+  return membership;
+};
+
 export const createTask = async (
   projectId: string,
   organizationId: string,
@@ -37,6 +58,10 @@ export const createTask = async (
   data: CreateTaskInput
 ) => {
   await findProject(projectId, organizationId);
+
+if (data.assigneeId) {
+  await findOrganizationMember(data.assigneeId, organizationId);
+}
 
   const task = await prisma.task.create({
     data: {
@@ -155,6 +180,10 @@ export const updateTask = async (
   if (!task) {
     throw new AppError("Task not found", 404);
   }
+
+  if (data.assigneeId) {
+  await findOrganizationMember(data.assigneeId, organizationId);
+}
 
   const updatedTask = await prisma.task.update({
     where: { id },
@@ -338,3 +367,4 @@ export const updateTaskStatus = async (
 
   return updatedTask;
 };
+
