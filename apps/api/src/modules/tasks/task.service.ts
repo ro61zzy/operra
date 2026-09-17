@@ -59,11 +59,12 @@ export const createTask = async (
   });
 
   if (task.dueDate && task.assigneeId) {
-    await addTaskDueNotificationJob(
-      task.id,
-      task.assigneeId
-    );
-  }
+  await addTaskDueNotificationJob(
+    task.id,
+    task.assigneeId,
+    task.dueDate
+  );
+}
 
   return task;
 };
@@ -250,7 +251,8 @@ if (
 ) {
   await addTaskDueNotificationJob(
     updatedTask.id,
-    updatedTask.assigneeId
+    updatedTask.assigneeId,
+    updatedTask.dueDate
   );
 }
   

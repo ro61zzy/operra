@@ -2,8 +2,19 @@ import { notificationQueue } from "./notification.queue";
 
 export const addTaskDueNotificationJob = async (
   taskId: string,
-  userId: string
+  userId: string,
+  dueDate: Date
 ) => {
+  const now = Date.now();
+
+  const notificationTime =
+    dueDate.getTime() - 24 * 60 * 60 * 1000;
+
+  const delay = Math.max(
+    notificationTime - now,
+    0
+  );
+
   await notificationQueue.add(
     "task-due",
     {
@@ -11,7 +22,7 @@ export const addTaskDueNotificationJob = async (
       userId,
     },
     {
-      delay: 24 * 60 * 60 * 1000,
+      delay,
       removeOnComplete: true,
       removeOnFail: false,
     }

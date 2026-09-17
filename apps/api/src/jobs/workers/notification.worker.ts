@@ -54,3 +54,5 @@ notificationWorker.on("failed", (job, error) => {
     error
   );
 });
+
+ console.log("Notification worker started");
